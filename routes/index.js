@@ -1,23 +1,28 @@
 var express = require('express');
 var router = express.Router();
-// var passportLocal = require('passport-local');
-// var passporthttp = require('passport-http');
-// var expressSession = require('express-session');
 var passport = require('passport');
 var passportLocal = require('passport-local');
-passport.use(new passportLocal.Strategy(function(username, password, done){
-  // hooking up db later
-  if(username === password){
-    done(null, {id: username, name: username})
-  }
-  else{
-    done(null, null);
-  }
-  // Three possible options:
-  // done(null, user);
-  // done(null, null);
-  // done(new Error('muchos diablos errr'));
-}));
+var passportHttp = require('passport-http')
+
+function verifyCredentials(username, password, done){
+	// hooking up db later
+	if(username === password){
+	  done(null, {id: username, name: username})
+	}
+	else{
+	  done(null, null);
+	}
+	// Three possible options:
+	// done(null, user);
+	// done(null, null);
+	// done(new Error('muchos diablos errr'));
+};
+
+// cookie based - session token
+passport.use(new passportLocal.Strategy(verifyCredentials));
+
+// header that has username and password comes with every request - constantly authenticate.
+passport.use(new passportHttp.BasicStrategy(verifyCredentials));
 
 passport.serializeUser(function(user, done){
 	done(null, user.id)
@@ -27,6 +32,9 @@ passport.deserializeUser(function(id, done){
 	// this is where you would query the db or cache
 	done(null, {id: id, name: id})
 });
+
+
+router.use('/api', passport.authenticate('basic'));
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -58,6 +66,27 @@ router.post('/login',passport.authenticate('local') ,function(req,res,next){
 router.get('/logout', function(req, res){
 	req.logout();
 	res.redirect('/');
+});
+
+// custom middleware::
+function ensureAuthenticated(req, res, next) {
+	if (req.isAuthenticated()){
+		next();
+	}
+	else{
+		// redirect, maybe use query string parameter
+		res.send(403);
+	}
+};
+
+// now express will call the ensureAuthenticated function when this endpoint gets a request.
+router.get('/api/data', ensureAuthenticated ,function(req, res, next){
+	res.json([
+			{ mid: 'buzzz'},
+			{ driver: 'orc'},
+			{ fareway: 'teebird'},
+			{ putter: 'aviar'}
+		])
 });
 
 module.exports = router;
