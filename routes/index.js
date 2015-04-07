@@ -30,11 +30,17 @@ passport.deserializeUser(function(id, done){
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	console.log('req.isAuthenticated::::::::::::::::::::::::::', req.isAuthenticated())
+	// console.log('req.user::::::::::::::::::::::::::', req.user);
+	if(req.isAuthenticated()){
+		var theUser = req.user;
+	}
+	else{
+		var theUser = "potential user";
+	}
   res.render('index', { 
   	title: 'devMentor',
-  	isAuthenticated: req.isAuthenticated(),
-  	user: req.user
+  	user: theUser,
+  	isAuthenticated: req.isAuthenticated()
   });
 });
 
@@ -45,7 +51,12 @@ router.get('/login', function(req,res,next){
 });
 
 router.post('/login',passport.authenticate('local') ,function(req,res,next){
-	// res.send('hola mundo, yo vivo en la router');
+	// res.send('hola mundo, vivo en la router');
+	res.redirect('/');
+});
+
+router.get('/logout', function(req, res){
+	req.logout();
 	res.redirect('/');
 });
 

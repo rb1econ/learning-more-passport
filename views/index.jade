@@ -3,7 +3,8 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
-  if isAuthenticated
-    a(href="/login") Please click here to login. 
+  if !isAuthenticated
+    a(href="/login") Please click here to login.
   else
-    p Hello #{user}
+    p Hello #{user.name}
+    a(href="/logout") If you want to, if you want to
