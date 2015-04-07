@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var passportLocal = require('passport-local');
 var passportHttp = require('passport-http');
-var expressSession = require('express-session')
+var expressSession = require('express-session') //unnecessary in pure api server
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -36,8 +36,8 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(expressSession({
+app.use(cookieParser()); //unnecessary in pure api server
+app.use(expressSession({ // unnecessary in pure api server
   secret: process.env.SESSION_SECRET || 'secret',
   resave: false,
   saveUninitialized: false
@@ -45,7 +45,7 @@ app.use(expressSession({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.session());//unnecessary in pure api server
 
 app.use('/', routes);
 app.use('/users', users);

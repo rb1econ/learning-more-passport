@@ -21,7 +21,7 @@ function verifyCredentials(username, password, done){
 // cookie based - session token
 passport.use(new passportLocal.Strategy(verifyCredentials));
 
-// header that has username and password comes with every request - constantly authenticate.
+// header that has username and password comes with every request - constantly authenticate. "Authorization": "Basic YXNkZjphc2Rm" and for fun: atob('YXNkZjphc2Rm'); >> asdf: asdf;
 passport.use(new passportHttp.BasicStrategy(verifyCredentials));
 
 passport.serializeUser(function(user, done){
@@ -34,7 +34,7 @@ passport.deserializeUser(function(id, done){
 });
 
 
-router.use('/api', passport.authenticate('basic'));
+router.use('/api', passport.authenticate('basic', {session: false}));
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
